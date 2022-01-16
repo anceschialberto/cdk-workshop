@@ -5,7 +5,7 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 const dynamo = new DynamoDB({});
 const lambda = new Lambda({});
 
-const handler: APIGatewayProxyHandler = async function(event) {
+export const handler: APIGatewayProxyHandler = async function(event) {
   console.log("request:", JSON.stringify(event, undefined, 2));
 
   // update dynamo entry for "path" with hits++
