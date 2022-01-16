@@ -1,6 +1,7 @@
 import { App, Stack, StackProps } from 'aws-cdk-lib';
 import { aws_lambda } from 'aws-cdk-lib';
 import { aws_lambda_nodejs } from 'aws-cdk-lib';
+import { aws_apigateway as apigw } from 'aws-cdk-lib';
 
 export class CdkWorkshopStack extends Stack {
   constructor(scope: App, id: string, props?: StackProps) {
@@ -10,6 +11,10 @@ export class CdkWorkshopStack extends Stack {
       runtime: aws_lambda.Runtime.NODEJS_14_X,
       entry: "lambda/hello.ts",
       handler: "handler",
+    })
+
+    new apigw.LambdaRestApi(this, 'Endpoint', {
+      handler: hello
     })
   }
 }
