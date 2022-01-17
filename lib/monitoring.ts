@@ -20,28 +20,8 @@ export class Monitoring extends Construct {
       expression: 'm1/m2*100',
       label: '% API Gateway 4xx Errors',
       usingMetrics: {
-        m1: new cloudwatch.Metric({
-          metricName: '4XXError',
-          namespace: 'AWS/ApiGateway',
-          dimensionsMap: {
-            ApiId: apiId
-          },
-          unit: cloudwatch.Unit.COUNT,
-          label: '4XX Errors',
-          statistic: 'sum',
-          period: Duration.seconds(900)
-        }),
-        m2: new cloudwatch.Metric({
-          metricName: 'Count',
-          namespace: 'AWS/ApiGateway',
-          dimensionsMap: {
-            ApiId: apiId
-          },
-          unit: cloudwatch.Unit.COUNT,
-          label: '# Requests',
-          statistic: 'sum',
-          period: Duration.seconds(900)
-        }),
+        m1: this.metricForApiGw(apiId, '4XXError', '4XX Errors', 'sum'),
+        m2: this.metricForApiGw(apiId, 'Count', '# Requests', 'sum'),
       },
       period: Duration.minutes(5)
     });
@@ -64,17 +44,7 @@ export class Monitoring extends Construct {
       new GraphWidget({
         title: 'Requests',
         left: [
-          new cloudwatch.Metric({
-            metricName: 'Count',
-            namespace: 'AWS/ApiGateway',
-            dimensionsMap: {
-              ApiId: apiId
-            },
-            unit: cloudwatch.Unit.COUNT,
-            label: '# Requests',
-            statistic: 'sum',
-            period: Duration.seconds(900)
-          })
+          this.metricForApiGw(apiId, 'Count', '# Requests', 'sum'),
         ],
         stacked: false,
         width: 8
@@ -82,32 +52,31 @@ export class Monitoring extends Construct {
       new GraphWidget({
         title: 'API GW Errors',
         left: [
-          new cloudwatch.Metric({
-            metricName: '4XXError',
-            namespace: 'AWS/ApiGateway',
-            dimensionsMap: {
-              ApiId: apiId
-            },
-            unit: cloudwatch.Unit.COUNT,
-            label: '4XX Errors',
-            statistic: 'sum',
-            period: Duration.seconds(900)
-          }),
-          new cloudwatch.Metric({
-            metricName: '5XXError',
-            namespace: 'AWS/ApiGateway',
-            dimensionsMap: {
-              ApiId: apiId
-            },
-            unit: cloudwatch.Unit.COUNT,
-            label: '5XX Errors',
-            statistic: 'sum',
-            period: Duration.seconds(900)
-          })
+          this.metricForApiGw(apiId, '4XXError', '4XX Errors', 'sum'),
+          this.metricForApiGw(apiId, '5XXError', '5XX Errors', 'sum'),
         ],
         stacked: false,
         width: 8
       })
     );
+  }
+
+  private metricForApiGw(apiId: string, metricName: string, label: string, stat = 'avg'): cloudwatch.Metric {
+    let dimensions = {
+      ApiId: apiId
+    };
+    return this.buildMetric(metricName, 'AWS/ApiGateway', dimensions, cloudwatch.Unit.COUNT, label, stat);
+  }
+
+  private buildMetric(metricName: string, namespace: string, dimensions: cloudwatch.DimensionsMap, unit: cloudwatch.Unit, label: string, stat = 'avg', period = 900): cloudwatch.Metric {
+    return new cloudwatch.Metric({
+      metricName,
+      namespace: namespace,
+      dimensionsMap: dimensions,
+      unit: unit,
+      label: label,
+      statistic: stat,
+      period: Duration.seconds(period)
+    });
   }
 }
