@@ -4,6 +4,7 @@ import { aws_lambda_nodejs } from 'aws-cdk-lib';
 import { aws_apigateway as apigw } from 'aws-cdk-lib';
 
 import { HitCounter } from './hitcounter';
+import { Monitoring } from './monitoring';
 
 export class CdkWorkshopStack extends Stack {
   constructor(scope: App, id: string, props?: StackProps) {
@@ -19,8 +20,12 @@ export class CdkWorkshopStack extends Stack {
       downstream: hello
     });
 
-    new apigw.LambdaRestApi(this, 'Endpoint', {
+    const api = new apigw.LambdaRestApi(this, 'Endpoint', {
       handler: helloWithCounter.handler
+    })
+
+    new Monitoring(this, 'HelloMonitoring', {
+      apiId: api.restApiId
     })
   }
 }
