@@ -63,7 +63,7 @@ export class Monitoring extends Construct {
 
   private metricForApiGw(apiId: string, metricName: string, label: string, stat = 'avg'): cloudwatch.Metric {
     let dimensions = {
-      ApiId: apiId
+      ApiName: apiId
     };
     return this.buildMetric(metricName, 'AWS/ApiGateway', dimensions, cloudwatch.Unit.COUNT, label, stat);
   }
