@@ -1,7 +1,9 @@
+import { Fn } from 'aws-cdk-lib';
 import { App, Stack, StackProps } from 'aws-cdk-lib';
 import { aws_lambda } from 'aws-cdk-lib';
 import { aws_lambda_nodejs } from 'aws-cdk-lib';
 import { aws_apigateway as apigw } from 'aws-cdk-lib';
+import { aws_iam as iam } from 'aws-cdk-lib';
 
 import { NetworkingStack } from './networking-stack';
 import { HitCounter } from './hitcounter';
@@ -35,7 +37,23 @@ export class CdkWorkshopStack extends Stack {
       endpointConfiguration: {
         types: [apigw.EndpointType.PRIVATE],
         vpcEndpoints: [network.apiInterfaceVpcEndpoint]
-      }
+      },
+      policy: new iam.PolicyDocument({
+        statements: [
+          new iam.PolicyStatement({
+            principals: [new iam.StarPrincipal],
+            actions: ["execute-api:Invoke"],
+            resources: [Fn.join('', ['execute-api:/', '*'])],
+            conditions: {
+              StringEquals: {
+                "aws:SourceVpce": [
+                  network.apiInterfaceVpcEndpoint.vpcEndpointId,
+                ],
+              },
+            },
+          })
+        ]
+      })
     })
 
     new Monitoring(this, 'HelloMonitoring', {
