@@ -2,10 +2,13 @@ import { Construct } from 'constructs';
 import { aws_lambda as lambda } from 'aws-cdk-lib';
 import { aws_lambda_nodejs } from 'aws-cdk-lib';
 import { aws_dynamodb as dynamodb } from 'aws-cdk-lib';
+import { aws_ec2 as ec2 } from 'aws-cdk-lib';
 
 export interface HitCounterProps {
   /** the function for which we want to count url hits **/
   downstream: lambda.IFunction;
+  vpc: ec2.Vpc,
+  vpcSubnets: ec2.SelectedSubnets
 }
 
 export class HitCounter extends Construct {
@@ -29,7 +32,9 @@ export class HitCounter extends Construct {
       },
       bundling: {
         sourceMap: true,
-      }
+      },
+      vpc: props.vpc,
+      vpcSubnets: props.vpcSubnets
     });
 
     table.grantReadWriteData(this.handler);
