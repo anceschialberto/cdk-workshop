@@ -1,13 +1,14 @@
-import { App, Stack, StackProps } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { NestedStack, NestedStackProps } from 'aws-cdk-lib';
 import { aws_ec2 as ec2 } from 'aws-cdk-lib';
 
-export class NetworkingStack extends Stack {
+export class NetworkingStack extends NestedStack {
   public readonly vpc: ec2.Vpc;
   public readonly privateSubnets: ec2.SelectedSubnets;
   public readonly apiInterfaceVpcEndpoint: ec2.InterfaceVpcEndpoint;
 
-  constructor(scope: App, id: string, props?: StackProps) {
-    super(scope, id, props);
+  constructor(scope: Construct, props?: NestedStackProps) {
+    super(scope, 'NetworkingNestedStack', props);
 
     this.vpc = new ec2.Vpc(this, 'VPC');
 

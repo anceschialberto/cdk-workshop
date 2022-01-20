@@ -11,7 +11,7 @@ export class CdkWorkshopStack extends Stack {
   constructor(scope: App, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const network = new NetworkingStack(scope, 'NetworkingStack');
+    const network = new NetworkingStack(this);
 
     const hello = new aws_lambda_nodejs.NodejsFunction(this, 'HelloHandler', {
       runtime: aws_lambda.Runtime.NODEJS_14_X,
