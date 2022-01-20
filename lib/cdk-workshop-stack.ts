@@ -14,6 +14,9 @@ export class CdkWorkshopStack extends Stack {
       runtime: aws_lambda.Runtime.NODEJS_14_X,
       entry: "lambda/hello.ts",
       handler: "handler",
+      bundling: {
+        sourceMap: true,
+      }
     })
 
     const helloWithCounter = new HitCounter(this, 'HelloHitCounter', {

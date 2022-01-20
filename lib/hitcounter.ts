@@ -26,6 +26,9 @@ export class HitCounter extends Construct {
       environment: {
         DOWNSTREAM_FUNCTION_NAME: props.downstream.functionName,
         HITS_TABLE_NAME: table.tableName
+      },
+      bundling: {
+        sourceMap: true,
       }
     });
 

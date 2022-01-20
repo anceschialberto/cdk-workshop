@@ -1,0 +1,13 @@
+{
+    "configurations": [
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach to SAM CLI",
+            "address": "localhost",
+            "port": 5858,
+            "localRoot": "${workspaceRoot}/cdk.out/asset.034fe0b26aa8de758ca460aeac07f9bb2b8ba75735764b6c7b09f7876b195633",
+            "remoteRoot": "/var/task"
+        }
+    ]
+}
