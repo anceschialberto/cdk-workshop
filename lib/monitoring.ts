@@ -2,16 +2,17 @@ import { Construct } from 'constructs';
 import { aws_cloudwatch as cloudwatch } from 'aws-cdk-lib';
 import { Duration } from 'aws-cdk-lib';
 import { GraphWidget } from 'aws-cdk-lib/aws-cloudwatch';
+import { aws_apigateway as apigw } from 'aws-cdk-lib';
 
 export interface MonitoringProps {
-  apiId: string;
+  api: apigw.LambdaRestApi;
 }
 
 export class Monitoring extends Construct {
   constructor(scope: Construct, id: string, props: MonitoringProps) {
     super(scope, id);
 
-    const { apiId } = props;
+    const { api } = props;
 
     /*
      * Custom metrics
@@ -20,8 +21,8 @@ export class Monitoring extends Construct {
       expression: 'm1/m2*100',
       label: '% API Gateway 4xx Errors',
       usingMetrics: {
-        m1: this.metricForApiGw(apiId, '4XXError', '4XX Errors', 'sum'),
-        m2: this.metricForApiGw(apiId, 'Count', '# Requests', 'sum'),
+        m1: this.metricForApiGw(api.restApiName, '4XXError', '4XX Errors', 'sum'),
+        m2: this.metricForApiGw(api.restApiName, 'Count', '# Requests', 'sum'),
       },
       period: Duration.minutes(5)
     });
@@ -44,7 +45,7 @@ export class Monitoring extends Construct {
       new GraphWidget({
         title: 'Requests',
         left: [
-          this.metricForApiGw(apiId, 'Count', '# Requests', 'sum'),
+          this.metricForApiGw(api.restApiName, 'Count', '# Requests', 'sum'),
         ],
         stacked: false,
         width: 8
@@ -52,8 +53,8 @@ export class Monitoring extends Construct {
       new GraphWidget({
         title: 'API GW Errors',
         left: [
-          this.metricForApiGw(apiId, '4XXError', '4XX Errors', 'sum'),
-          this.metricForApiGw(apiId, '5XXError', '5XX Errors', 'sum'),
+          this.metricForApiGw(api.restApiName, '4XXError', '4XX Errors', 'sum'),
+          this.metricForApiGw(api.restApiName, '5XXError', '5XX Errors', 'sum'),
         ],
         stacked: false,
         width: 8
@@ -61,9 +62,9 @@ export class Monitoring extends Construct {
     );
   }
 
-  private metricForApiGw(apiId: string, metricName: string, label: string, stat = 'avg'): cloudwatch.Metric {
+  private metricForApiGw(apiName: string, metricName: string, label: string, stat = 'avg'): cloudwatch.Metric {
     let dimensions = {
-      ApiName: apiId
+      ApiName: apiName,
     };
     return this.buildMetric(metricName, 'AWS/ApiGateway', dimensions, cloudwatch.Unit.COUNT, label, stat);
   }

@@ -28,7 +28,7 @@ export class CdkWorkshopStack extends Stack {
     })
 
     new Monitoring(this, 'HelloMonitoring', {
-      apiId: api.restApiId
+      api
     })
   }
 }
