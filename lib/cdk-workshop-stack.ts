@@ -46,6 +46,9 @@ export class CdkWorkshopStack extends Stack {
             resources: [Fn.join('', ['execute-api:/', '*'])],
             conditions: {
               StringEquals: {
+                "aws:SourceVpc": [
+                  network.vpc.vpcId,
+                ],
                 "aws:SourceVpce": [
                   network.apiInterfaceVpcEndpoint.vpcEndpointId,
                 ],
